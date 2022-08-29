@@ -25,6 +25,7 @@ class Product(BaseModel):
     name = models.CharField(max_length=100)
     description = models.TextField()
     category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT)
+    price = models.DecimalField(max_digits=16, decimal_places=2)
     active = models.BooleanField(default=True)
 
 
@@ -45,6 +46,14 @@ class Order(BaseModel):
 
 class OrderItem(BaseModel):
     order = models.ForeignKey(Order, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=16, decimal_places=2)
     unit_price = models.DecimalField(max_digits=16, decimal_places=2)
     subtotal = models.DecimalField(max_digits=16, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        if not self.unit_price:
+            self.unit_price = self.product.price
+            
+        self.subtotal = self.unit_price * self.amount    
+        return super().save(*args, **kwargs)
