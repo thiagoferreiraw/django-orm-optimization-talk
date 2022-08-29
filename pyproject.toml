@@ -8,6 +8,7 @@ authors = ["Thiago Ferreira <th.thiago96@gmail.com>"]
 python = "^3.9"
 Django = "^4.1"
 factory-boy = "^3.2.1"
+django-extensions = "^3.2.0"
 
 [tool.poetry.dev-dependencies]
 factory-boy = "^3.2.1"
