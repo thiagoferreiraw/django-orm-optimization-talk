@@ -18,6 +18,9 @@ See available params with:
 poetry run python manage.py create_test_records --help
 ```
 
+![Screen Shot 2022-09-03 at 15 20 26](https://user-images.githubusercontent.com/9268203/188283454-683d145e-70f3-42e2-9f54-4f3ff20c7566.png)
+
+
 ## Running sample queries
 
 In file `shop/samples.py`, we can find several good/bad examples of ORM queries. 
