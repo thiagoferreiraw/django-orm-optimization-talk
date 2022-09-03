@@ -1,9 +1,9 @@
-from django.db.models import Avg, Count, Max, Min, Sum
+from django.db.models import Avg, Count, Max, Min, Sum, Exists, OuterRef
 
 from django.db.models import Prefetch
 
 from shop.helpers import debug_queries, DebugTypes
-from shop.models import Customer, Order, OrderItem
+from shop.models import Customer, Order, OrderItem, Product
 
 
 @debug_queries()
@@ -102,6 +102,23 @@ def list_top_paying_customers(limit=5):
         print("Customer: ", name)
         print("Orders placed: ", orders_placed)
         print("Total Value: ", total_value)
+
+
+@debug_queries(DebugTypes.FULL)
+def list_product_top_sales(has_sales=True, limit=5):
+    produts_with_sales = (
+        Product.objects.annotate(
+            has_sales=Exists(OrderItem.objects.filter(product_id=OuterRef("id"))),
+            total_sold=Sum("items_sold__subtotal"),
+        )
+        .filter(has_sales=has_sales)
+        .order_by("-total_sold")
+        .values_list("name", "total_sold")[:limit]
+    )
+
+    for name, total_sold in produts_with_sales:
+        print("Product: ", name)
+        print("Total Sold: ", total_sold, "\n")
 
 
 def run_all():
