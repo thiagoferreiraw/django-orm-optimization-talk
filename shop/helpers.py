@@ -22,7 +22,7 @@ def debug_queries(print_mode=DebugTypes.SHORT):
 
 
 def _print_sql_statements(print_mode):
-    print(f"\n{'-'*60}\nSQL statements:\n")
+    print(f"\n{'-'*60}\n[{len(connection.queries)}] SQL statements executed:\n")
     for idx, query in enumerate(connection.queries, start=1):
         print(idx, _get_formatted_sql_statement(query["sql"], print_mode), "\n")
     print(f"\n{'-'*60}")
