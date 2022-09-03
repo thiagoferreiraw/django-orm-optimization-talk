@@ -2,6 +2,7 @@ from random import choice, randint
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Avg, Count, Max, Min, Sum
+from factory import LazyFunction
 
 from shop.factory import (
     CustomerFactory,
@@ -15,10 +16,10 @@ from shop.models import Customer, Order
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("--total_customers", type=int, default=100, required=False)
-        parser.add_argument("--total_categories", type=int, default=10, required=False)
-        parser.add_argument("--total_products", type=int, default=100, required=False)
-        parser.add_argument("--total_orders", type=int, default=100, required=False)
+        parser.add_argument("--total_customers", type=int, default=1000, required=False)
+        parser.add_argument("--total_categories", type=int, default=50, required=False)
+        parser.add_argument("--total_products", type=int, default=1000, required=False)
+        parser.add_argument("--total_orders", type=int, default=5000, required=False)
         parser.add_argument(
             "--max_items_per_order", type=int, default=6, required=False
         )
@@ -26,21 +27,31 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         customers, orders, categories, products = [], [], [], []
 
-        for _ in range(options["total_customers"]):
-            customers.append(CustomerFactory())
+        self.stdout.write(f"Inserting test records with options = {options}")
 
-        for _ in range(options["total_categories"]):
-            categories.append(ProductCategoryFactory())
+        self.stdout.write(f"Inserting {options['total_customers']} Customers")
+        customers = CustomerFactory.create_batch(options["total_customers"])
 
-        for _ in range(options["total_products"]):
-            products.append(ProductFactory(category=choice(categories)))
+        self.stdout.write(f"Inserting {options['total_categories']} Categories")
+        categories = ProductCategoryFactory.create_batch(options["total_categories"])
 
-        for _ in range(options["total_orders"]):
-            orders.append(OrderFactory(customer=choice(customers)))
+        self.stdout.write(f"Inserting {options['total_products']} Products")
+        products = ProductFactory.create_batch(
+            options["total_products"], category=LazyFunction(lambda: choice(categories))
+        )
 
+        self.stdout.write(f"Inserting {options['total_orders']} Orders")
+        orders = OrderFactory.create_batch(
+            options["total_orders"], customer=LazyFunction(lambda: choice(customers))
+        )
+
+        self.stdout.write(f"Creating order items...")
         for order in orders:
-            for _ in range(randint(1, options["max_items_per_order"])):
-                OrderItemFactory(product=choice(products), order=order)
+            OrderItemFactory.create_batch(
+                randint(1, options["max_items_per_order"]),
+                order=order,
+                product=LazyFunction(lambda: choice(products)),
+            )
             order.save(should_calculate_total=True)
 
         self.stdout.write(self.style.SUCCESS("Done!"))
@@ -49,7 +60,7 @@ class Command(BaseCommand):
             items_count=Avg("items__count")
         )
         order_stats = Order.objects.aggregate(
-            Avg("total"), Max("total"), Min("total"), Sum("total")
+            Avg("total"), Max("total"), Min("total"), Sum("total"), Count("id")
         )
         top_five_customers = (
             Customer.objects.annotate(orders_placed=Count("orders"))
