@@ -12,8 +12,13 @@ class BaseModel(models.Model):
 class Customer(BaseModel):
     name = models.CharField(max_length=100)
     birth_date = models.DateField()
-    email = models.EmailField(null=True, blank=True)
+    email = models.EmailField(null=True, blank=True, db_index=True)
+    email_non_indexed = models.EmailField(null=True, blank=True)
     country = models.CharField(max_length=2)
+
+    def save(self, *args, **kwargs):
+        self.email_non_indexed = self.email
+        return super.save(*args, **kwargs)
 
 
 class ProductCategory(BaseModel):
