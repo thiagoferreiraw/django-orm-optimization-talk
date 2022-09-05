@@ -11,6 +11,7 @@ class CustomerFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     birth_date = factory.Faker("date")
     country = factory.Iterator(["US", "BR", "AR"])
+    email = factory.Faker("email")
 
 
 class ProductCategoryFactory(factory.django.DjangoModelFactory):

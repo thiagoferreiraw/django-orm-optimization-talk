@@ -12,6 +12,7 @@ class BaseModel(models.Model):
 class Customer(BaseModel):
     name = models.CharField(max_length=100)
     birth_date = models.DateField()
+    email = models.EmailField(null=True, blank=True)
     country = models.CharField(max_length=2)
 
 
