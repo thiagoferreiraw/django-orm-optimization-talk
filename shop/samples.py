@@ -81,12 +81,37 @@ def list_multiple_orders_and_items_good(limit=5):
 
 
 @debug_queries(DebugTypes.FULL)
-def list_order_totals():
-    order_stats = Order.objects.aggregate(
-        Avg("total"), Max("total"), Min("total"), Sum("total"), count_orders=Count("id")
+def list_total_sold_for_email_good(email="bramirez@example.com"):
+    # Uses the indexed email field
+    total_sold_for_email = Order.objects.filter(
+        customer__email="bramirez@example.com"
+    ).aggregate(total_sold=Sum("total"))
+
+    print(f"Total sold for {email}: ${total_sold_for_email['total_sold']}")
+
+@debug_queries(DebugTypes.FULL)
+def list_total_sold_for_email_bad(email="bramirez@example.com"):
+    # Uses the non indexed email field
+    total_sold_for_email = Order.objects.filter(
+        customer__email_non_indexed="bramirez@example.com"
+    ).aggregate(total_sold=Sum("total"))
+
+    print(f"Total sold for {email}: ${total_sold_for_email['total_sold']}")
+
+
+@debug_queries(DebugTypes.FULL)
+def list_top_paying_customers(limit=5):
+    top_customers = (
+        Customer.objects.annotate(
+            orders_placed=Count("orders"), total_value=Sum("orders__total")
+        )
+        .order_by("-total_value")
+        .values_list("name", "orders_placed", "total_value")[:limit]
     )
-    for key, value in order_stats.items():
-        print(f"{key} => {value}")
+    for name, orders_placed, total_value in top_customers:
+        print("Customer: ", name)
+        print("Orders placed: ", orders_placed)
+        print("Total Value: ", total_value)
 
 
 @debug_queries(DebugTypes.FULL)
