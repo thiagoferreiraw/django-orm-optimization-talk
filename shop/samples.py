@@ -80,20 +80,20 @@ def list_multiple_orders_and_items_good(limit=5):
             print("Subtotal: ", item.subtotal, "\n")
 
 
-@debug_queries(DebugTypes.FULL)
-def list_total_sold_for_email_good(email="bramirez@example.com"):
-    # Uses the indexed email field
-    total_sold_for_email = Order.objects.filter(
-        customer__email="bramirez@example.com"
-    ).aggregate(total_sold=Sum("total"))
+    @debug_queries(DebugTypes.FULL)
+    def list_total_sold_for_email_good(email="bramirez@example.com"):
+        # Uses the indexed email field
+        total_sold_for_email = Order.objects.filter(
+            customer__email=email
+        ).aggregate(total_sold=Sum("total"))
 
-    print(f"Total sold for {email}: ${total_sold_for_email['total_sold']}")
+        print(f"Total sold for {email}: ${total_sold_for_email['total_sold']}")
 
 @debug_queries(DebugTypes.FULL)
 def list_total_sold_for_email_bad(email="bramirez@example.com"):
     # Uses the non indexed email field
     total_sold_for_email = Order.objects.filter(
-        customer__email_non_indexed="bramirez@example.com"
+        customer__email_non_indexed=email
     ).aggregate(total_sold=Sum("total"))
 
     print(f"Total sold for {email}: ${total_sold_for_email['total_sold']}")
