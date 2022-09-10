@@ -36,7 +36,8 @@ Then, in the python shell, run:
 from shop.samples import list_orders_bad
 list_orders_bad()
 ```
-![sample-bad](https://user-images.githubusercontent.com/9268203/188282980-5ec2f999-41c6-4402-b2c1-dd15b4faf7e9.png)
+<img width="787" alt="image" src="https://user-images.githubusercontent.com/9268203/189481719-c6c4cb3f-1b98-409b-8d6c-6acabd44f13a.png">
+
 
 
 Another example:
@@ -47,4 +48,4 @@ from shop.samples import list_orders_good
 list_orders_good()
 ```
 
-![sample-good](https://user-images.githubusercontent.com/9268203/188282977-161cf40f-f596-474c-ab41-2e5a6b7972f6.png)
+<img width="839" alt="image" src="https://user-images.githubusercontent.com/9268203/189481726-94765ab5-5ae6-4242-97dc-68647d889d97.png">
