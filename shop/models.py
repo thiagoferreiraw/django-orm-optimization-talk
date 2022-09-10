@@ -1,4 +1,5 @@
 from django.db import models
+from shop.managers import OrderManager
 
 
 class BaseModel(models.Model):
@@ -18,7 +19,7 @@ class Customer(BaseModel):
 
     def save(self, *args, **kwargs):
         self.email_non_indexed = self.email
-        return super.save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class ProductCategory(BaseModel):
@@ -52,6 +53,8 @@ class Order(BaseModel):
         max_length=20,
     )
     total = models.DecimalField(max_digits=16, decimal_places=2)
+
+    objects = OrderManager()
 
     def _calculate_total(self):
         self.total = self.items.all().aggregate(models.Sum("subtotal"))["subtotal__sum"]
