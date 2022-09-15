@@ -1,8 +1,7 @@
-from django.db.models import Avg, Count, Max, Min, Sum, Exists, OuterRef
+from django.db import connection
+from django.db.models import Avg, Count, Exists, Max, Min, OuterRef, Prefetch, Sum
 
-from django.db.models import Prefetch
-
-from shop.helpers import debug_queries, DebugTypes
+from shop.helpers import DebugTypes, debug_queries
 from shop.models import Customer, Order, OrderItem, Product
 
 
@@ -11,6 +10,24 @@ def list_orders_bad(limit=5):
     orders = Order.objects.filter()[:limit]
     for order in orders:
         print(f"Order #{order.id} - {order.customer.name} - ${order.total}")
+
+
+@debug_queries()
+def list_orders_without_orm(limit=5):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            'select "shop_order"."id", '
+            '  "shop_customer"."name", '
+            '  "shop_order"."total" '
+            'FROM "shop_order" '
+            'INNER JOIN "shop_customer" '
+            '  ON ("shop_order"."customer_id" = "shop_customer"."id") '
+            "LIMIT 5"
+        )
+        orders = cursor.fetchall()
+
+    for (order_id, customer_name, total) in orders:
+        print(f"Order #{order_id} - {customer_name} - ${total}")
 
 
 @debug_queries()
