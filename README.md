@@ -1,5 +1,9 @@
 # django-orm-optimization-talk
 
+## Presentation slides
+
+[Python Brasil 2022 - Queries performáticas com ORM em Python, Django e Postgres.pdf](https://github.com/thiagoferreiraw/django-orm-optimization-talk/blob/main/Python%20Brasil%202022%20-%20Queries%20perform%C3%A1ticas%20com%20ORM%20em%20Python%2C%20Django%20e%20Postgres.pdf)
+
 ## Installing
 Make sure you have poetry installed, then run:
 ```
